@@ -17,7 +17,7 @@ export default function RegisterPage() {
     setLoading(true);
     setError('');
 
-    const { data, error: err } = await supabase.auth.signUp({
+    const { error: err } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -36,66 +36,62 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-dark flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-card rounded-2xl p-6 border border-border">
-        <h1 className="text-2xl font-bold text-center mb-6">
-          🌏 Daftar
-        </h1>
+    <div className="auth-bg flex items-center justify-center p-6">
+      <div className="auth-card w-full max-w-sm p-8">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-[#1e3a8a] flex items-center justify-center text-2xl mb-4">
+            ✨
+          </div>
+          <h1 className="text-xl font-bold text-gray-900">Buat Akun</h1>
+          <p className="text-xs text-gray-500 mt-1">Gratis, hanya butuh 30 detik</p>
+        </div>
 
         {error && (
-          <div className="bg-danger/20 border border-danger text-danger text-sm p-3 rounded-lg mb-4">
+          <div className="bg-red-50 border border-red-200 text-red-600 text-xs p-3 rounded-xl mb-4">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleRegister} className="space-y-4">
-          <div>
-            <label className="text-sm text-gray-400 mb-1 block">Username</label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full bg-dark border border-border rounded-lg px-4 py-3 text-white focus:border-primary outline-none"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-gray-400 mb-1 block">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-dark border border-border rounded-lg px-4 py-3 text-white focus:border-primary outline-none"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-gray-400 mb-1 block">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-dark border border-border rounded-lg px-4 py-3 text-white focus:border-primary outline-none"
-              required
-              minLength={6}
-            />
-          </div>
+        <form onSubmit={handleRegister} className="space-y-3">
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="auth-input"
+            required
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="auth-input"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password (min. 6 karakter)"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="auth-input"
+            required
+            minLength={6}
+          />
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50"
+            className="auth-btn mt-4"
           >
-            {loading ? 'Loading...' : 'Daftar'}
+            {loading ? 'Memuat...' : 'Daftar Sekarang'}
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-4">
-          Udah punya akun?{' '}
-          <Link href="/login" className="text-primary hover:underline">
-            Login
+        <p className="text-center text-xs text-gray-500 mt-6">
+          Sudah punya akun?{' '}
+          <Link href="/login" className="text-[#1e3a8a] font-semibold">
+            Masuk
           </Link>
         </p>
       </div>
