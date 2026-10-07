@@ -6,7 +6,7 @@ export default function ProductGrid({ products, loading }) {
     return (
       <div className="grid grid-cols-2 gap-3 px-4">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="rounded-2xl h-56 skeleton" />
+          <div key={i} className="rounded-2xl h-56 bg-white/5 animate-pulse" />
         ))}
       </div>
     );
@@ -16,8 +16,8 @@ export default function ProductGrid({ products, loading }) {
     return (
       <div className="text-center py-20 px-4">
         <div className="text-5xl mb-3 opacity-20">📦</div>
-        <p className="text-sm text-muted-2 font-medium">Belum ada produk</p>
-        <p className="text-xs text-muted mt-1">Produk akan muncul di sini</p>
+        <p className="text-sm text-gray-400 font-medium">Belum ada produk</p>
+        <p className="text-xs text-gray-600 mt-1">Produk akan muncul di sini</p>
       </div>
     );
   }
