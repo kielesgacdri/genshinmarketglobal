@@ -1,94 +1,150 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
-import Navbar from '@/components/Navbar';
-import ProductGrid from '@/components/ProductGrid';
-import { Search, Bell } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import Link from 'next/link';
 
-export default function Home() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [category, setCategory] = useState('Semua');
-  const [search, setSearch] = useState('');
-  const router = useRouter();
+export default function RegisterPage() {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPass, setShowPass] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    checkAuth();
-    loadProducts();
-  }, []);
-
-  const checkAuth = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) router.push('/login');
-  };
-
-  const loadProducts = async () => {
+  const handleRegister = async (e) => {
+    e.preventDefault();
     setLoading(true);
-    const { data } = await supabase
-      .from('products')
-      .select('*, profiles:seller_id(username)')
-      .eq('status', 'active')
-      .order('created_at', { ascending: false });
-    setProducts(data || []);
-    setLoading(false);
-  };
+    setError('');
 
-  const filtered = products.filter((p) => {
-    const matchCat = category === 'Semua' || p.game === category;
-    const matchSearch = p.title?.toLowerCase().includes(search.toLowerCase());
-    return matchCat && matchSearch;
-  });
+    try {
+      const uname = username.toLowerCase().trim();
+
+      const { data: existing } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('username', uname)
+        .maybeSingle();
+
+      if (existing) {
+        setError('Username sudah dipakai');
+        setLoading(false);
+        return;
+      }
+
+      const { error: authErr } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { username: uname } },
+      });
+
+      if (authErr) {
+        setError(authErr.message);
+        setLoading(false);
+        return;
+      }
+
+      alert('Registrasi berhasil! Silakan login.');
+      window.location.href = '/login';
+    } catch (err) {
+      setError('Error: ' + err.message);
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-[#0f1729] pt-16 pb-24">
-      <Navbar />
+    <div className="min-h-screen bg-[#0f1729] flex items-center justify-center p-5 relative overflow-hidden">
+      <div className="absolute top-[-100px] right-[-100px] w-72 h-72 rounded-full bg-blue-600 opacity-20 blur-3xl"></div>
+      <div className="absolute bottom-[-100px] left-[-100px] w-72 h-72 rounded-full bg-cyan-500 opacity-20 blur-3xl"></div>
 
-      <div className="px-4 pt-4 pb-3 flex gap-2">
-        <div className="flex-1 bg-white/5 border border-white/10 rounded-xl flex items-center px-3 py-2.5 gap-2">
-          <Search size={16} className="text-gray-500" />
-          <input
-            type="text"
-            placeholder="Cari akun..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 bg-transparent text-sm text-white placeholder:text-gray-500 outline-none"
-          />
+      <div className="w-full max-w-sm relative z-10">
+        <div className="text-center mb-8">
+          <div className="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shadow-2xl shadow-blue-500/30 mb-4">
+            <span className="text-3xl font-black text-white">G</span>
+          </div>
+          <h1 className="text-2xl font-bold text-white tracking-tight">
+            GenshinMarket<span className="text-cyan-400">Global</span>
+          </h1>
+          <p className="text-xs text-gray-500 mt-1">Daftar akun gratis</p>
         </div>
-        <button className="bg-white/5 border border-white/10 rounded-xl px-3">
-          <Bell size={18} className="text-gray-500" />
-        </button>
-      </div>
 
-      <div className="px-4 mb-4">
-        <h1 className="text-2xl font-extrabold text-white leading-tight">
-          GenshinMarket<span className="text-cyan-400">Global</span>
-        </h1>
-        <p className="text-xs text-gray-500 mt-0.5">Marketplace akun game terpercaya</p>
-      </div>
+        <div className="bg-white rounded-[2rem] p-7 shadow-2xl">
+          <h2 className="text-lg font-bold text-gray-900 mb-1">Daftar</h2>
+          <p className="text-xs text-gray-400 mb-6">Isi data di bawah untuk buat akun</p>
 
-      <div className="px-4 mb-4 flex gap-2 overflow-x-auto pb-1">
-        {['Semua', 'Genshin Impact', 'Free Fire', 'Mobile Legends'].map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setCategory(cat)}
-            className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition ${
-              category === cat
-                ? 'bg-blue-600 text-white'
-                : 'bg-white/5 border border-white/10 text-gray-400'
-            }`}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
+          {error && (
+            <div className="bg-red-50 border border-red-100 text-red-500 text-xs p-3 rounded-xl mb-4 text-center">
+              {error}
+            </div>
+          )}
 
-      <div className="px-4 mb-3 flex items-center justify-between">
-        <h2 className="text-sm font-bold text-white">Produk Terbaru</h2>
-        <span className="text-[10px] text-gray-500">{filtered.length} item</span>
-      </div>
+          <form onSubmit={handleRegister} className="space-y-3">
+            <div className="relative">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                <User size={18} />
+              </div>
+              <input
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 pl-12 pr-4 text-sm text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition outline-none"
+                required
+                minLength={3}
+              />
+            </div>
 
-      <ProductGrid products={filtered} loading={loading} />
+            <div className="relative">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                <Mail size={18} />
+              </div>
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 pl-12 pr-4 text-sm text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition outline-none"
+                required
+              />
+            </div>
+
+            <div className="relative">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                <Lock size={18} />
+              </div>
+              <input
+                type={showPass ? 'text' : 'password'}
+                placeholder="Password (min 6)"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 pl-12 pr-12 text-sm text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition outline-none"
+                required
+                minLength={6}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPass(!showPass)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
+              >
+                {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold py-4 rounded-2xl transition shadow-lg shadow-blue-500/20 disabled:opacity-50 mt-2"
+            >
+              {loading ? 'Memproses...' : 'Daftar Sekarang'}
+            </button>
+          </form>
+
+          <p className="text-center text-xs text-gray-400 mt-6">
+            Sudah punya akun?{' '}
+            <Link href="/login" className="text-blue-600 font-semibold">Masuk</Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
-}
+                  }
