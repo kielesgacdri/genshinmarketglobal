@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import { LogOut, Package, Users, DollarSign, MessageCircle, Plus } from 'lucide-react';
+import { LogOut, Package, Users, DollarSign, MessageCircle, Plus, Crown } from 'lucide-react';
 import Link from 'next/link';
 
 export default function OwnerDashboard() {
@@ -24,7 +24,7 @@ export default function OwnerDashboard() {
       .eq('id', user.id)
       .single();
 
-    if (prof?.role !== 'owner') return router.push('/dashboard');
+    if (prof?.role !== 'owner') return router.push('/');
     setProfile(prof);
 
     const [{ count: p }, { count: u }, { count: t }] = await Promise.all([
@@ -37,7 +37,7 @@ export default function OwnerDashboard() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    router.push('/login');
+    window.location.href = '/login';
   };
 
   if (!profile) {
@@ -53,7 +53,10 @@ export default function OwnerDashboard() {
       <div className="max-w-md mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <p className="text-xs text-yellow-400 font-semibold">👑 OWNER PANEL</p>
+            <div className="flex items-center gap-1.5 mb-1">
+              <Crown size={14} className="text-yellow-400" />
+              <p className="text-xs text-yellow-400 font-bold">OWNER PANEL</p>
+            </div>
             <h1 className="text-xl font-bold">{profile.username}</h1>
           </div>
           <button onClick={handleLogout} className="p-2 bg-red-500/10 rounded-xl">
@@ -81,23 +84,27 @@ export default function OwnerDashboard() {
 
         <Link
           href="/owner/tambah-produk"
-          className="block w-full bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-4 text-center font-semibold mb-3 shadow-lg shadow-blue-500/20"
+          className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-4 text-center font-semibold mb-3 shadow-lg shadow-blue-500/20"
         >
-          <Plus size={16} className="inline mr-2" />
+          <Plus size={16} />
           Tambah Produk
         </Link>
 
         <div className="space-y-2">
-          <button className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-left flex items-center gap-3">
+          <Link href="/chat" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center gap-3">
             <MessageCircle size={18} className="text-cyan-400" />
             <span className="text-sm font-medium">Chat & Rekber</span>
-          </button>
-          <button className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-left flex items-center gap-3">
+          </Link>
+          <Link href="/owner/kelola-seller" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center gap-3">
             <Users size={18} className="text-green-400" />
             <span className="text-sm font-medium">Kelola Seller</span>
-          </button>
+          </Link>
+          <Link href="/" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center gap-3">
+            <Package size={18} className="text-blue-400" />
+            <span className="text-sm font-medium">Lihat Web Publik</span>
+          </Link>
         </div>
       </div>
     </div>
   );
-}
+            }
