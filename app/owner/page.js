@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import { LogOut, Package, Users, DollarSign, MessageCircle, Plus, Crown } from 'lucide-react';
+import { LogOut, Package, Users, DollarSign, MessageCircle, Plus, Crown, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
 export default function OwnerDashboard() {
@@ -42,69 +42,109 @@ export default function OwnerDashboard() {
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-[#0f1729] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0a0e1a] flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0f1729] text-white p-5">
-      <div className="max-w-md mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <div className="flex items-center gap-1.5 mb-1">
-              <Crown size={14} className="text-yellow-400" />
-              <p className="text-xs text-yellow-400 font-bold">OWNER PANEL</p>
+    <div className="min-h-screen bg-[#0a0e1a] text-white pb-8 fade-in">
+      {/* Header */}
+      <header className="sticky top-0 z-40 glass-strong">
+        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button onClick={() => router.push('/')} className="p-2 glass rounded-xl">
+              <ArrowLeft size={18} />
+            </button>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <Crown size={11} className="text-yellow-400" />
+                <p className="text-[10px] text-yellow-400 font-black tracking-wider">OWNER PANEL</p>
+              </div>
+              <p className="font-bold text-sm">{profile.username}</p>
             </div>
-            <h1 className="text-xl font-bold">{profile.username}</h1>
           </div>
-          <button onClick={handleLogout} className="p-2 bg-red-500/10 rounded-xl">
-            <LogOut size={18} className="text-red-400" />
+          <button onClick={handleLogout} className="p-2 bg-red-500/10 border border-red-500/20 rounded-xl">
+            <LogOut size={16} className="text-red-400" />
           </button>
         </div>
+      </header>
 
-        <div className="grid grid-cols-3 gap-2 mb-4">
-          <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/10 border border-blue-500/20 rounded-2xl p-3">
-            <Package size={16} className="text-blue-400 mb-1" />
-            <p className="text-[10px] text-gray-400">Produk</p>
-            <p className="text-base font-bold">{stats.products}</p>
+      <div className="max-w-2xl mx-auto p-4">
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-2.5 mb-5">
+          <div className="glass rounded-2xl p-3.5 relative overflow-hidden">
+            <div className="absolute -top-8 -right-8 w-20 h-20 bg-blue-500/20 rounded-full blur-2xl"></div>
+            <Package size={18} className="text-blue-400 mb-2 relative" />
+            <p className="text-[10px] text-gray-500 font-semibold relative">Produk</p>
+            <p className="text-xl font-black mt-0.5 relative">{stats.products}</p>
           </div>
-          <div className="bg-gradient-to-br from-green-500/20 to-green-600/10 border border-green-500/20 rounded-2xl p-3">
-            <Users size={16} className="text-green-400 mb-1" />
-            <p className="text-[10px] text-gray-400">User</p>
-            <p className="text-base font-bold">{stats.users}</p>
+          <div className="glass rounded-2xl p-3.5 relative overflow-hidden">
+            <div className="absolute -top-8 -right-8 w-20 h-20 bg-green-500/20 rounded-full blur-2xl"></div>
+            <Users size={18} className="text-green-400 mb-2 relative" />
+            <p className="text-[10px] text-gray-500 font-semibold relative">User</p>
+            <p className="text-xl font-black mt-0.5 relative">{stats.users}</p>
           </div>
-          <div className="bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 border border-yellow-500/20 rounded-2xl p-3">
-            <DollarSign size={16} className="text-yellow-400 mb-1" />
-            <p className="text-[10px] text-gray-400">Transaksi</p>
-            <p className="text-base font-bold">{stats.tx}</p>
+          <div className="glass rounded-2xl p-3.5 relative overflow-hidden">
+            <div className="absolute -top-8 -right-8 w-20 h-20 bg-yellow-500/20 rounded-full blur-2xl"></div>
+            <DollarSign size={18} className="text-yellow-400 mb-2 relative" />
+            <p className="text-[10px] text-gray-500 font-semibold relative">Order</p>
+            <p className="text-xl font-black mt-0.5 relative">{stats.tx}</p>
           </div>
         </div>
 
+        {/* CTA */}
         <Link
           href="/owner/tambah-produk"
-          className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-4 text-center font-semibold mb-3 shadow-lg shadow-blue-500/20"
+          className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-blue-600 to-blue-500 rounded-2xl p-4 font-black text-sm shadow-xl shadow-blue-500/30 mb-4 active:scale-[0.98] transition"
         >
-          <Plus size={16} />
+          <Plus size={18} />
           Tambah Produk
         </Link>
 
-        <div className="space-y-2">
-          <Link href="/chat" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center gap-3">
-            <MessageCircle size={18} className="text-cyan-400" />
-            <span className="text-sm font-medium">Chat & Rekber</span>
+        {/* Menu */}
+        <div className="space-y-2.5">
+          <Link href="/chat" className="flex items-center justify-between w-full glass rounded-2xl p-4 active:scale-[0.98] transition">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center">
+                <MessageCircle size={18} className="text-cyan-400" />
+              </div>
+              <div>
+                <p className="text-sm font-bold">Chat & Rekber</p>
+                <p className="text-[10px] text-gray-500">Kelola transaksi</p>
+              </div>
+            </div>
+            <span className="text-gray-500">→</span>
           </Link>
-          <Link href="/owner/kelola-seller" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center gap-3">
-            <Users size={18} className="text-green-400" />
-            <span className="text-sm font-medium">Kelola Seller</span>
+
+          <Link href="/owner/kelola-seller" className="flex items-center justify-between w-full glass rounded-2xl p-4 active:scale-[0.98] transition">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
+                <Users size={18} className="text-green-400" />
+              </div>
+              <div>
+                <p className="text-sm font-bold">Kelola Seller</p>
+                <p className="text-[10px] text-gray-500">ACC / tolak seller</p>
+              </div>
+            </div>
+            <span className="text-gray-500">→</span>
           </Link>
-          <Link href="/" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center gap-3">
-            <Package size={18} className="text-blue-400" />
-            <span className="text-sm font-medium">Lihat Web Publik</span>
+
+          <Link href="/" className="flex items-center justify-between w-full glass rounded-2xl p-4 active:scale-[0.98] transition">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                <Package size={18} className="text-blue-400" />
+              </div>
+              <div>
+                <p className="text-sm font-bold">Lihat Web Publik</p>
+                <p className="text-[10px] text-gray-500">Cek tampilan buyer</p>
+              </div>
+            </div>
+            <span className="text-gray-500">→</span>
           </Link>
         </div>
       </div>
     </div>
   );
-            }
+    }
