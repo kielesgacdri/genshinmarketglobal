@@ -27,7 +27,6 @@ export default function LoginPage() {
       return;
     }
 
-    // Cek role user
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
@@ -42,57 +41,62 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-dark flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-card rounded-2xl p-6 border border-border">
-        <h1 className="text-2xl font-bold text-center mb-6">
-          🌏 Login
-        </h1>
+    <div className="auth-bg flex items-center justify-center p-6">
+      <div className="auth-card w-full max-w-sm p-8">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-[#1e3a8a] flex items-center justify-center text-2xl mb-4">
+            🌏
+          </div>
+          <h1 className="text-xl font-bold text-gray-900">Selamat Datang</h1>
+          <p className="text-xs text-gray-500 mt-1">Masuk untuk lanjut</p>
+        </div>
 
         {error && (
-          <div className="bg-danger/20 border border-danger text-danger text-sm p-3 rounded-lg mb-4">
+          <div className="bg-red-50 border border-red-200 text-red-600 text-xs p-3 rounded-xl mb-4">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label className="text-sm text-gray-400 mb-1 block">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-dark border border-border rounded-lg px-4 py-3 text-white focus:border-primary outline-none"
-              required
-            />
-          </div>
+        <form onSubmit={handleLogin} className="space-y-3">
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="auth-input"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="auth-input"
+            required
+          />
 
-          <div>
-            <label className="text-sm text-gray-400 mb-1 block">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-dark border border-border rounded-lg px-4 py-3 text-white focus:border-primary outline-none"
-              required
-            />
+          <div className="text-right pt-1">
+            <Link href="/lupa-password" className="text-xs text-[#1e3a8a] font-medium">
+              Lupa password?
+            </Link>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50"
+            className="auth-btn mt-2"
           >
-            {loading ? 'Loading...' : 'Login'}
+            {loading ? 'Memuat...' : 'Masuk'}
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-4">
+        <p className="text-center text-xs text-gray-500 mt-6">
           Belum punya akun?{' '}
-          <Link href="/register" className="text-primary hover:underline">
+          <Link href="/register" className="text-[#1e3a8a] font-semibold">
             Daftar
           </Link>
         </p>
       </div>
     </div>
   );
-                }
+              }
