@@ -2,49 +2,67 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Home, MessageCircle, ShoppingBag, User } from 'lucide-react';
+import { Home, MessageCircle, ShoppingBag, User, Crown } from 'lucide-react';
 
 export default function Navbar() {
   const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+    load();
   }, []);
+
+  const load = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setUser(user);
+    if (user) {
+      const { data } = await supabase
+        .from('profiles')
+        .select('role, username')
+        .eq('id', user.id)
+        .single();
+      setProfile(data);
+    }
+  };
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-border">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#0f1729]/95 backdrop-blur border-b border-white/5">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center font-bold text-sm">
-              G
-            </div>
-            <span className="font-bold text-sm">GenshinMarket</span>
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center font-bold text-sm text-white">G</div>
+            <span className="font-bold text-sm text-white">GenshinMarket</span>
           </Link>
-          <Link
-            href={user ? '/profil' : '/login'}
-            className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-primary/20 text-primary border border-primary/30"
-          >
-            {user ? 'Profil' : 'Masuk'}
-          </Link>
+
+          <div className="flex items-center gap-2">
+            {profile?.role === 'owner' && (
+              <Link href="/owner" className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 flex items-center gap-1">
+                <Crown size={12} />
+                Panel
+              </Link>
+            )}
+            <Link href={user ? '/profil' : '/login'} className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30">
+              {user ? profile?.username || 'Profil' : 'Masuk'}
+            </Link>
+          </div>
         </div>
       </header>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 glass border-t border-border">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#0f1729]/95 backdrop-blur border-t border-white/5">
         <div className="max-w-2xl mx-auto grid grid-cols-4">
-          <Link href="/" className="flex flex-col items-center py-3 gap-1 text-primary">
+          <Link href="/" className="flex flex-col items-center py-3 gap-1 text-blue-400">
             <Home size={20} />
             <span className="text-[10px] font-medium">Home</span>
           </Link>
-          <Link href="/chat" className="flex flex-col items-center py-3 gap-1 text-muted">
+          <Link href="/chat" className="flex flex-col items-center py-3 gap-1 text-gray-500">
             <MessageCircle size={20} />
             <span className="text-[10px] font-medium">Chat</span>
           </Link>
-          <Link href="/transaksi" className="flex flex-col items-center py-3 gap-1 text-muted">
+          <Link href="/transaksi" className="flex flex-col items-center py-3 gap-1 text-gray-500">
             <ShoppingBag size={20} />
             <span className="text-[10px] font-medium">Transaksi</span>
           </Link>
-          <Link href={user ? '/profil' : '/login'} className="flex flex-col items-center py-3 gap-1 text-muted">
+          <Link href={user ? '/profil' : '/login'} className="flex flex-col items-center py-3 gap-1 text-gray-500">
             <User size={20} />
             <span className="text-[10px] font-medium">Profil</span>
           </Link>
@@ -52,4 +70,4 @@ export default function Navbar() {
       </nav>
     </>
   );
-            }
+              }
