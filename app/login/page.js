@@ -1,8 +1,8 @@
 'use client';
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
 import { User, Lock, Eye, EyeOff } from 'lucide-react';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -10,7 +10,6 @@ export default function LoginPage() {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const router = useRouter();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -20,7 +19,6 @@ export default function LoginPage() {
     try {
       const uname = username.toLowerCase().trim();
 
-      // 1. Cari profile
       const { data: profile, error: profErr } = await supabase
         .from('profiles')
         .select('email, role')
@@ -39,7 +37,6 @@ export default function LoginPage() {
         return;
       }
 
-      // 2. Login
       const { error: authErr } = await supabase.auth.signInWithPassword({
         email: profile.email,
         password,
@@ -51,12 +48,7 @@ export default function LoginPage() {
         return;
       }
 
-      // 3. Redirect
-      if (profile.role === 'owner') {
-        window.location.href = '/owner';
-      } else {
-        window.location.href = '/dashboard';
-      }
+      window.location.href = '/';
     } catch (err) {
       setError('Error: ' + err.message);
       setLoading(false);
@@ -135,10 +127,11 @@ export default function LoginPage() {
           </form>
 
           <p className="text-center text-xs text-gray-400 mt-6">
-            Belum punya akun? Hubungi admin
+            Belum punya akun?{' '}
+            <Link href="/register" className="text-blue-600 font-semibold">Daftar</Link>
           </p>
         </div>
       </div>
     </div>
   );
-            }
+}
