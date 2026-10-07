@@ -17,12 +17,31 @@ export default function Home() {
 
   const loadProducts = async () => {
     setLoading(true);
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('products')
-      .select('*, profiles:seller_id(username)')
+      .select('*')
       .eq('status', 'active')
       .order('created_at', { ascending: false });
-    setProducts(data || []);
+
+    if (error) {
+      console.log('ERROR:', error.message);
+      setLoading(false);
+      return;
+    }
+
+    // Ambil username seller buat tiap produk
+    const withSellers = await Promise.all(
+      (data || []).map(async (p) => {
+        const { data: prof } = await supabase
+          .from('profiles')
+          .select('username')
+          .eq('id', p.seller_id)
+          .maybeSingle();
+        return { ...p, profiles: prof };
+      })
+    );
+
+    setProducts(withSellers);
     setLoading(false);
   };
 
@@ -36,7 +55,6 @@ export default function Home() {
     <div className="min-h-screen bg-[#0a0e1a] pt-16 pb-24">
       <Navbar />
 
-      {/* Search */}
       <div className="px-4 pt-5 pb-4 flex gap-2">
         <div className="flex-1 glass rounded-2xl flex items-center px-4 py-3 gap-2.5">
           <Search size={18} className="text-gray-500" />
@@ -50,11 +68,9 @@ export default function Home() {
         </div>
         <button className="glass rounded-2xl px-3.5 relative">
           <Bell size={18} className="text-gray-400" />
-          <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
         </button>
       </div>
 
-      {/* Hero */}
       <div className="px-4 mb-5">
         <h1 className="text-[26px] font-black leading-none tracking-tight">
           GenshinMarket<span className="gradient-text">Global</span>
@@ -62,7 +78,6 @@ export default function Home() {
         <p className="text-xs text-gray-500 mt-1.5">Marketplace akun game terpercaya</p>
       </div>
 
-      {/* Categories */}
       <div className="px-4 mb-5 flex gap-2 overflow-x-auto pb-1">
         {['Semua', 'Genshin Impact', 'Free Fire', 'Mobile Legends'].map((cat) => (
           <button
@@ -79,7 +94,6 @@ export default function Home() {
         ))}
       </div>
 
-      {/* Section */}
       <div className="px-4 mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Flame size={14} className="text-orange-400" />
@@ -93,4 +107,4 @@ export default function Home() {
       <ProductGrid products={filtered} loading={loading} />
     </div>
   );
-        }
+          }
