@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Home, MessageCircle, ShoppingBag, User, Crown } from 'lucide-react';
+import { Home, MessageCircle, ShoppingBag, User, Crown, LogIn } from 'lucide-react';
 
 export default function Navbar() {
   const [user, setUser] = useState(null);
@@ -25,6 +25,13 @@ export default function Navbar() {
     }
   };
 
+  const handleProtectedClick = (e) => {
+    if (!user) {
+      e.preventDefault();
+      window.location.href = '/login';
+    }
+  };
+
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-50 bg-[#0f1729]/95 backdrop-blur border-b border-white/5">
@@ -41,9 +48,16 @@ export default function Navbar() {
                 Panel
               </Link>
             )}
-            <Link href={user ? '/profil' : '/login'} className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30">
-              {user ? profile?.username || 'Profil' : 'Masuk'}
-            </Link>
+            {user ? (
+              <Link href="/profil" className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                {profile?.username || 'Profil'}
+              </Link>
+            ) : (
+              <Link href="/login" className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-blue-600 text-white flex items-center gap-1">
+                <LogIn size={12} />
+                Masuk
+              </Link>
+            )}
           </div>
         </div>
       </header>
@@ -54,11 +68,11 @@ export default function Navbar() {
             <Home size={20} />
             <span className="text-[10px] font-medium">Home</span>
           </Link>
-          <Link href="/chat" className="flex flex-col items-center py-3 gap-1 text-gray-500">
+          <Link href="/chat" onClick={handleProtectedClick} className="flex flex-col items-center py-3 gap-1 text-gray-500">
             <MessageCircle size={20} />
             <span className="text-[10px] font-medium">Chat</span>
           </Link>
-          <Link href="/transaksi" className="flex flex-col items-center py-3 gap-1 text-gray-500">
+          <Link href="/transaksi" onClick={handleProtectedClick} className="flex flex-col items-center py-3 gap-1 text-gray-500">
             <ShoppingBag size={20} />
             <span className="text-[10px] font-medium">Transaksi</span>
           </Link>
