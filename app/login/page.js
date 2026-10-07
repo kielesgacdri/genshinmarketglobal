@@ -17,33 +17,49 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
 
-    const { data: profile, error: profErr } = await supabase
-      .from('profiles')
-      .select('email, role')
-      .eq('username', username.toLowerCase().trim())
-      .single();
+    try {
+      const uname = username.toLowerCase().trim();
 
-    if (profErr || !profile) {
-      setError('Username tidak ditemukan');
+      // 1. Cari profile
+      const { data: profile, error: profErr } = await supabase
+        .from('profiles')
+        .select('email, role')
+        .eq('username', uname)
+        .maybeSingle();
+
+      if (profErr) {
+        setError('DB Error: ' + profErr.message);
+        setLoading(false);
+        return;
+      }
+
+      if (!profile) {
+        setError('Username tidak ditemukan');
+        setLoading(false);
+        return;
+      }
+
+      // 2. Login
+      const { error: authErr } = await supabase.auth.signInWithPassword({
+        email: profile.email,
+        password,
+      });
+
+      if (authErr) {
+        setError('Password salah');
+        setLoading(false);
+        return;
+      }
+
+      // 3. Redirect
+      if (profile.role === 'owner') {
+        window.location.href = '/owner';
+      } else {
+        window.location.href = '/dashboard';
+      }
+    } catch (err) {
+      setError('Error: ' + err.message);
       setLoading(false);
-      return;
-    }
-
-    const { error: err } = await supabase.auth.signInWithPassword({
-      email: profile.email,
-      password,
-    });
-
-    if (err) {
-      setError('Password salah');
-      setLoading(false);
-      return;
-    }
-
-    if (profile.role === 'owner') {
-      router.push('/owner');
-    } else {
-      router.push('/dashboard');
     }
   };
 
@@ -103,7 +119,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowPass(!showPass)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
               >
                 {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -112,7 +128,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 rounded-2xl transition shadow-lg shadow-blue-500/20 disabled:opacity-50 mt-2"
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold py-4 rounded-2xl transition shadow-lg shadow-blue-500/20 disabled:opacity-50 mt-2"
             >
               {loading ? 'Memproses...' : 'Masuk'}
             </button>
@@ -125,4 +141,4 @@ export default function LoginPage() {
       </div>
     </div>
   );
-}
+            }
